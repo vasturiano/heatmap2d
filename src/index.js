@@ -34,6 +34,7 @@ export default Kapsule({
 
     state.canvas = document.createElement('canvas');
     state.canvas.style.display = 'block';
+    state.canvas.style.pointerEvents = 'none';
     domNode.appendChild(state.canvas);
   },
 
