@@ -1,6 +1,6 @@
 {
   "name": "heatmap2d",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Two dimensional heatmap rendered on HTML5 canvas",
   "type": "module",
   "unpkg": "dist/heatmap2d.min.js",
