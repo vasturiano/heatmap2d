@@ -1,0 +1,22 @@
+<head>
+  <style>
+    body { margin: 0 }
+  </style>
+
+  <script src="//cdn.jsdelivr.net/npm/heatmap2d"></script>
+<!--    <script src="../../dist/heatmap2d.js"></script>-->
+</head>
+<body>
+  <div id="my-heatmap"></div>
+
+  <script>
+    const NUM_PNTS = 300;
+    const pnts = [...Array(NUM_PNTS)].map(() => [
+      Math.round(Math.random() * window.innerWidth),
+      Math.round(Math.random() * window.innerHeight)
+    ]);
+
+    const heatmap = new Heatmap(document.getElementById('my-heatmap'))
+      .data(pnts);
+  </script>
+</body>
