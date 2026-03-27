@@ -1,0 +1,40 @@
+<head>
+  <style>
+    body { margin: 0 }
+
+    #zoom-trap {
+      height: 100%;
+    }
+
+    #my-heatmap {
+      position: absolute;
+      top: 0;
+      pointer-events: none;
+    }
+  </style>
+
+  <!-- <script src="../../dist/heatmap2d.js"></script>-->
+</head>
+<body>
+  <div id="zoom-trap"></div>
+  <div id="my-heatmap"></div>
+
+  <script type="module">
+    import Heatmap from 'https://esm.sh/heatmap2d';
+    import { select } from 'https://esm.sh/d3-selection';
+    import { zoom } from 'https://esm.sh/d3-zoom';
+
+    const NUM_PNTS = 1e4;
+    const pnts = [...Array(NUM_PNTS)].map(() => [
+      Math.round(Math.random() * window.innerWidth),
+      Math.round(Math.random() * window.innerHeight)
+    ]);
+
+    const heatmap = new Heatmap(document.getElementById('my-heatmap'))
+      .data(pnts);
+
+    select('#zoom-trap').call(zoom().on('zoom', e => {
+      heatmap.data(pnts.map(pnt => e.transform.apply(pnt)));
+    }));
+  </script>
+</body>
