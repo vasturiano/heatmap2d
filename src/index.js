@@ -15,20 +15,33 @@ export default Kapsule({
     value: { default: 1 },
     blurRadius: { default: 30 },
     pxRatio: { default: 2 }, // pixelation factor to improve performance. Integer number.
+    maxValue: {},
+    saturation: { default: 1 },
     colorInterpolator: {
       default: interpolateTurbo,
       onChange(colorInterpolator, state) {
         const colorDomain = [...new Array(50)].map((_, idx, arr) => idx / (arr.length - 1));
         const colorArr = colorDomain.map((_, idx) => color(colorInterpolator(idx/(colorDomain.length - 1))));
-        state.rScale = scaleLinear(colorDomain, colorArr.map(c => c.r));
-        state.gScale = scaleLinear(colorDomain, colorArr.map(c => c.g));
-        state.bScale = scaleLinear(colorDomain, colorArr.map(c => c.b));
+        state.rScale = scaleLinear(colorDomain, colorArr.map(c => c.r)).clamp(true);
+        state.gScale = scaleLinear(colorDomain, colorArr.map(c => c.g)).clamp(true);
+        state.bScale = scaleLinear(colorDomain, colorArr.map(c => c.b)).clamp(true);
       }
     },
     opacity: { default: 0.7 }
   },
 
-  init: function(domNode, state) {
+  methods: {
+    getValueAt: (state, x, y) => state.valMatrix[
+      Math.round(x / state.pxRatio)
+      + Math.round(y / state.pxRatio) * Math.ceil(state.width / state.pxRatio)
+    ]
+  },
+
+  stateInit: () => ({
+    valMatrix: []
+  }),
+
+  init: (domNode, state) => {
     // Wipe DOM
     domNode.innerHTML = '';
 
@@ -38,7 +51,7 @@ export default Kapsule({
     domNode.appendChild(state.canvas);
   },
 
-  update: function updateFn(state) {
+  update: state => {
     const bw = state.blurRadius;
     const mgn = bw * 3; // compute heatmap with margin outside visible area to prevent flickering when points fall off the edge of the canvas.
     const pxR = state.pxRatio;
@@ -66,12 +79,12 @@ export default Kapsule({
     blur2({ data: pxMatrix, width: matW }, pxBw);
 
     // Remove matrix margin
-    const visMatrix= new Float32Array(pxW * pxH).map((_, idx)=>
+    const visMatrix= state.valMatrix = new Float32Array(pxW * pxH).map((_, idx)=>
       pxMatrix[idx % pxW + pxMgn + Math.floor(idx / pxW + pxMgn) * matW]
     );
 
     const imgData = new ImageData(w, h);
-    const maxVal = max(visMatrix) || 0;
+    const maxVal = (state.maxValue || max(visMatrix) || 0) / state.saturation;
     const pxIdxFn = pxR === 1
       ? idx => idx
       : idx => ((idx % pxW) + Math.floor(idx / pxW) * w) * pxR;
