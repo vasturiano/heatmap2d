@@ -20,8 +20,8 @@ export default Kapsule({
     colorInterpolator: {
       default: interpolateTurbo,
       onChange(colorInterpolator, state) {
-        const colorDomain = [...new Array(50)].map((_, idx, arr) => idx / (arr.length - 1));
-        const colorArr = colorDomain.map((_, idx) => color(colorInterpolator(idx/(colorDomain.length - 1))));
+        const colorDomain = [...new Array(100)].map((_, idx, arr) => idx / (arr.length - 1) * 2 - 1);
+        const colorArr = colorDomain.map(v => color(colorInterpolator(v)));
         state.rScale = scaleLinear(colorDomain, colorArr.map(c => c.r)).clamp(true);
         state.gScale = scaleLinear(colorDomain, colorArr.map(c => c.g)).clamp(true);
         state.bScale = scaleLinear(colorDomain, colorArr.map(c => c.b)).clamp(true);
@@ -84,12 +84,12 @@ export default Kapsule({
     );
 
     const imgData = new ImageData(w, h);
-    const maxVal = (state.maxValue || max(visMatrix) || 0) / state.saturation;
+    const maxVal = (state.maxValue || max(visMatrix.map(Math.abs)) || 0) / state.saturation;
     const pxIdxFn = pxR === 1
       ? idx => idx
       : idx => ((idx % pxW) + Math.floor(idx / pxW) * w) * pxR;
 
-    const opacityScale = scalePow([0, 0.25], [0, 255 * state.opacity])
+    const opacityScale = scalePow([-0.25, 0, 0.25], [255 * state.opacity, 0, 255 * state.opacity])
       .exponent(2)
       .clamp(true);
 
