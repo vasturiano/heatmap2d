@@ -1,0 +1,25 @@
+<head>
+  <style>
+    body { margin: 0 }
+  </style>
+
+  <script src="//cdn.jsdelivr.net/npm/heatmap2d"></script>
+<!--  <script src="../../dist/heatmap2d.js"></script>-->
+</head>
+<body>
+  <div id="my-heatmap"></div>
+
+  <script type="module">
+    const NUM_PNTS = 3000;
+    const pnts = [...Array(NUM_PNTS)].map(() => [
+      Math.round(Math.random() * window.innerWidth),
+      Math.round(Math.random() * window.innerHeight),
+      Math.random() - 0.5 // positive and negative weights
+    ]);
+
+    const heatmap = new Heatmap(document.getElementById('my-heatmap'))
+      .data(pnts)
+      .value(d => d[2])
+      .colorInterpolator(t => `rgb(${t > 0 ? `0,${Math.round(t*255)},0` : `${-Math.round(t*255)},0,0`})`);
+  </script>
+</body>
