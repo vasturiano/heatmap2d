@@ -93,7 +93,8 @@ export default Kapsule({
       .exponent(2)
       .clamp(true);
 
-    visMatrix.forEach((val, idx) => {
+    for (let idx = 0, len = visMatrix.length; idx < len; idx++) {
+      const val = visMatrix[idx];
       if (val) {
         const t = val / maxVal;
         const r = state.rScale(t);
@@ -112,7 +113,7 @@ export default Kapsule({
           }
         }
       }
-    });
+    }
 
     state.canvas.width = w;
     state.canvas.height = h;
