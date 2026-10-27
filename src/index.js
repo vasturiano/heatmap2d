@@ -1,7 +1,7 @@
-import { blur2, max } from 'd3-array';
-import { scalePow, scaleLinear } from 'd3-scale';
+import { blur2, max, range } from 'd3-array';
+import { scalePow } from 'd3-scale';
 import { interpolateTurbo } from 'd3-scale-chromatic';
-import { color } from 'd3-color';
+import { rgb as d3Rgb } from 'd3-color';
 import Kapsule from 'kapsule';
 import accessorFn from 'accessor-fn';
 
@@ -20,14 +20,22 @@ export default Kapsule({
     colorInterpolator: {
       default: interpolateTurbo,
       onChange(colorInterpolator, state) {
-        const colorDomain = [...new Array(100)].map((_, idx, arr) => idx / (arr.length - 1) * 2 - 1);
-        const colorArr = colorDomain.map(v => color(colorInterpolator(v)));
-        state.rScale = scaleLinear(colorDomain, colorArr.map(c => c.r)).clamp(true);
-        state.gScale = scaleLinear(colorDomain, colorArr.map(c => c.g)).clamp(true);
-        state.bScale = scaleLinear(colorDomain, colorArr.map(c => c.b)).clamp(true);
+        const len = 256 * 2; // [-1...0...1]
+        state.colorArr = range(len).map(v => d3Rgb(colorInterpolator(v / (len - 1) * 2 - 1)));
       }
     },
-    opacity: { default: 0.7 }
+    opacity: {
+      default: 0.7,
+      onChange(opacity, state) {
+        // make it transparent surrounding 0
+        const opacityScale = scalePow([-0.25, 0, 0.25], [255 * opacity, 0, 255 * opacity])
+          .exponent(2)
+          .clamp(true);
+
+        const len = 256 * 2;
+        state.opacityArr = range(len).map(v => opacityScale(v / (len - 1) * 2 - 1));
+      }
+    }
   },
 
   methods: {
@@ -89,18 +97,17 @@ export default Kapsule({
       ? idx => idx
       : idx => ((idx % pxW) + Math.floor(idx / pxW) * w) * pxR;
 
-    const opacityScale = scalePow([-0.25, 0, 0.25], [255 * state.opacity, 0, 255 * state.opacity])
-      .exponent(2)
-      .clamp(true);
-
     for (let idx = 0, len = visMatrix.length; idx < len; idx++) {
       const val = visMatrix[idx];
       if (val) {
         const t = val / maxVal;
-        const r = state.rScale(t);
-        const g = state.gScale(t);
-        const b = state.bScale(t);
-        const o = opacityScale(t);
+        const arrT = (t + 1) / 2;
+        const { r, g, b } = state.colorArr[Math.max(0, Math.min(state.colorArr.length - 1,
+          Math.floor(arrT * (state.colorArr.length - 1))
+        ))];
+        const o = state.opacityArr[Math.max(0, Math.min(state.opacityArr.length - 1,
+          Math.floor(arrT * (state.opacityArr.length - 1))
+        ))];
 
         const pxIdx = pxIdxFn(idx);
         for (let ox = 0; ox < pxR; ox++) {
