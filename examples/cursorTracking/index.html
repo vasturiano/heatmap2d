@@ -1,0 +1,26 @@
+<head>
+  <style>
+    body { margin: 0 }
+  </style>
+
+  <script src="//cdn.jsdelivr.net/npm/heatmap2d"></script>
+<!--    <script src="../../dist/heatmap2d.js"></script>-->
+</head>
+<body>
+  <div id="my-heatmap"></div>
+
+  <script>
+    const el = document.querySelector('#my-heatmap');
+
+    const heatmap = new Heatmap(el)
+      .blurRadius(11)
+      .pxRatio(1)
+      .opacity(1);
+
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerdown", onMove);
+    function onMove(e) {
+      heatmap.addPoint([e.clientX, e.clientY]);
+    }
+  </script>
+</body>

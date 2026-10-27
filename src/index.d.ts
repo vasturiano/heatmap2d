@@ -33,6 +33,7 @@ declare class Heatmap {
   opacity(opacity: number): Heatmap;
 
   getValueAt(x: number, y: number): number;
+  addPoint(pnt: object): Heatmap;
 }
 
 export default Heatmap;
