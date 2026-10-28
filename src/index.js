@@ -25,7 +25,7 @@ export default Kapsule({
       }
     },
     opacity: {
-      default: 0.7,
+      default: 0.8,
       onChange(opacity, state) {
         // make it transparent surrounding 0
         const opacityScale = scalePow([-0.25, 0, 0.25], [255 * opacity, 0, 255 * opacity])
