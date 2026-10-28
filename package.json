@@ -41,9 +41,7 @@
     "prepare": "npm run build"
   },
   "files": [
-    "dist/**/*",
-    "example/**/*",
-    "src/**/*"
+    "dist/**/*"
   ],
   "dependencies": {
     "accessor-fn": "1",
